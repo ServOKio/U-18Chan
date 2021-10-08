@@ -1,6 +1,6 @@
-# u_18chan
+# U-18Chan App
 
-A new Flutter project.
+A application for website u18chan.com
 
 ## Getting Started
 
