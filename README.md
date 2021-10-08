@@ -2,6 +2,12 @@
 
 A application for website u18chan.com
 
+<div style="display: flex;">
+<img src="https://github.com/ServOKio/U-18Chan/blob/master/%D0%A1%D0%BA%D1%80%D0%B8%D0%BD%D1%88%D0%BE%D1%82%2008.10.21_03.40.42.png" height="300px"/>
+<img src="https://github.com/ServOKio/U-18Chan/blob/master/%D0%A1%D0%BA%D1%80%D0%B8%D0%BD%D1%88%D0%BE%D1%82%2008.10.21_03.41.07.png" height="300px"/>
+<img src="https://github.com/ServOKio/U-18Chan/blob/master/%D0%A1%D0%BA%D1%80%D0%B8%D0%BD%D1%88%D0%BE%D1%82%2008.10.21_03.41.56.png" height="300px"/>
+</div>
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
