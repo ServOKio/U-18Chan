@@ -12,6 +12,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'dart:ui' as ui;
+import 'package:ext_storage/ext_storage.dart';
+import 'package:dio/dio.dart';
+import 'package:device_info/device_info.dart';
 
 import '../../main.dart';
 import '../section.dart';
@@ -365,7 +368,7 @@ class _ThreadViewState extends State<ThreadView> {
         return Container(
           decoration: BoxDecoration(
             backgroundBlendMode: BlendMode.colorBurn,
-            color: Colors.red,
+            color: theme.themeMainColor,
             image: DecorationImage(
                 image: imageProvider,
                 fit: BoxFit.cover
@@ -401,7 +404,7 @@ class _ThreadViewState extends State<ThreadView> {
                                   width: 14.0,
                                   height: 14.0,
                                   decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.red),
+                                      border: Border.all(color: theme.themeMainColor),
                                       shape: BoxShape.circle
                                   ),
                                   child: Center(child: Text(pm.sender[0], style: TextStyle(fontSize: 9))),
@@ -423,7 +426,7 @@ class _ThreadViewState extends State<ThreadView> {
           )
         );
       },
-      placeholder: (context, url) => Center(child: CircularProgressIndicator(color: Colors.red)),
+      placeholder: (context, url) => Center(child: CircularProgressIndicator(color: theme.themeMainColor)),
       errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
     )  : Container(
         decoration: BoxDecoration(
@@ -477,17 +480,25 @@ class _ThreadViewState extends State<ThreadView> {
           Padding(padding: EdgeInsets.only(right: 14), child: GestureDetector(
             onTap: (){
               SchedulerBinding.instance?.addPostFrameCallback((_) {
+                controller.animateTo(0, duration: const Duration(milliseconds: 100), curve: Curves.fastOutSlowIn);
+              });
+            },
+            child: Icon(Icons.arrow_upward),
+          )),
+          Padding(padding: EdgeInsets.only(right: 14), child: GestureDetector(
+            onTap: (){
+              SchedulerBinding.instance?.addPostFrameCallback((_) {
                 controller.animateTo(controller.position.maxScrollExtent, duration: const Duration(milliseconds: 100), curve: Curves.fastOutSlowIn);
               });
             },
             child: Icon(Icons.arrow_downward),
           )),
-          Padding(padding: EdgeInsets.only(right: 14), child: GestureDetector(
-            onTap: (){
-              load();
-            },
-            child: Icon(Icons.star_border),
-          ))
+          // Padding(padding: EdgeInsets.only(right: 14), child: GestureDetector(
+          //   onTap: (){
+          //     load();
+          //   },
+          //   child: Icon(Icons.star_border),
+          // ))
         ],
       ),
       body: error ? SafeArea(child: Padding(padding: EdgeInsets.all(30), child: Column(
@@ -507,7 +518,7 @@ class _ThreadViewState extends State<ThreadView> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Padding(padding: EdgeInsets.only(bottom: 12), child: CircularProgressIndicator(color: Colors.red)),
+          Padding(padding: EdgeInsets.only(bottom: 12), child: CircularProgressIndicator(color: theme.themeMainColor)),
           Text("Some themes require more time to download and process. Even if the circle has stopped spinning, the page still continues to load.", style: TextStyle(color: theme.newsBlockTitleSub)),
         ],
       )))
@@ -565,6 +576,7 @@ class _PostState extends State<Post> {
             padding: EdgeInsets.all(12),
             color: theme.newsBlock,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -574,7 +586,7 @@ class _PostState extends State<Post> {
                       width: 14.0,
                       height: 14.0,
                       decoration: BoxDecoration(
-                          border: Border.all(color: Colors.red),
+                          border: Border.all(color: theme.themeMainColor),
                           shape: BoxShape.circle
                       ),
                       child: Center(child: Text(widget.pm.sender[0], style: TextStyle(fontSize: 10))),
@@ -588,7 +600,7 @@ class _PostState extends State<Post> {
                   ],
                 ),
                 widget.pm.tags.length > 0 ? Padding(padding: EdgeInsets.only(top: 10), child: Align(alignment: Alignment.centerLeft, child: SingleChildScrollView(child: Row(children: tags), scrollDirection: Axis.horizontal),)) : SizedBox.shrink(),
-                widget.pm.content != '' ? Padding(padding: EdgeInsets.only(top: 10), child: Row(children: [
+                widget.pm.content  != '' ? Padding(padding: EdgeInsets.only(top: 10), child: Row(children: [
                   Flexible(child: Html(
                     style: {
                       "body": Style(
@@ -598,7 +610,7 @@ class _PostState extends State<Post> {
                     data: findShit(widget.pm.content),
                     customRender: {
                       "post": (RenderContext context, Widget child) {
-                        return Padding(padding: EdgeInsets.symmetric(vertical: 7),
+                        return widget.pm.replies[int.parse(context.tree.element!.text)] != null ? Padding(padding: EdgeInsets.symmetric(vertical: 7),
                             child:
                             // Row(children: [
                             //   Text(context.tree.element!.text, style: TextStyle(color: theme.link)),
@@ -657,7 +669,7 @@ class _PostState extends State<Post> {
                                       ]
                                   );
                                 },
-                                placeholder: (context, url) => Container(height: widget.pm.previewImageHeight.toDouble(), child: Center(child: CircularProgressIndicator(color: Colors.red, strokeWidth: 3))),
+                                placeholder: (context, url) => Container(height: widget.pm.previewImageHeight.toDouble(), child: Center(child: CircularProgressIndicator(color: theme.themeMainColor, strokeWidth: 3))),
                                 errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                               )) : SizedBox.shrink(),
                               widget.pm.replies[int.parse(context.tree.element!.text)]!.file.length > 0 ? ClipPath(
@@ -686,7 +698,7 @@ class _PostState extends State<Post> {
                                               imageBuilder: (context, imageProvider) {
                                                 return Image(image: imageProvider);
                                               },
-                                              progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red),
+                                              progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor),
                                               errorWidget: (context, url, error) => SizedBox.shrink(),
                                             )
                                         )) : SizedBox.shrink()
@@ -697,7 +709,7 @@ class _PostState extends State<Post> {
                               Padding(padding: EdgeInsets.only(top: 7), child: Align(alignment: Alignment.bottomRight, child: Icon(Icons.subdirectory_arrow_left, size: 13, color: theme.newsBlockTitleSub)))
                             ])
                           )
-                        );
+                        ) : Text(context.tree.element!.text);
                       },
                     },
                     tagsList: Html.tags..addAll(["post"]),
@@ -729,7 +741,7 @@ class _PostState extends State<Post> {
                                 imageBuilder: (context, imageProvider) {
                                   return Image(image: imageProvider);
                                 },
-                                progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red),
+                                progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor),
                                 errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                               )
                           )) : SizedBox.shrink()
@@ -740,41 +752,37 @@ class _PostState extends State<Post> {
                 widget.pm.previewImage != '' ? !fullImage ? Padding(padding: EdgeInsets.only(top: 10), child: CachedNetworkImage(
                   imageUrl: widget.pm.previewImage,
                   imageBuilder: (context, imageProvider) {
-                    return Row(
-                        children: [
-                          ClipRRect(
-                              borderRadius: BorderRadius.circular(3),
-                              child: Stack(
-                                children: [
-                                  GestureDetector(
-                                      onLongPress: (){
-                                        downloadImage(context, widget.pm.fullImage);
-                                      },
-                                      onTap: () {
-                                        openedPosts.add(widget.pm.postID);
-                                        setState(() {
-                                          fullImage = true;
-                                        });
-                                      },
-                                      child: Image(image: imageProvider)
-                                  ),
-                                  widget.pm.previewImage.endsWith('gif') ? Stack(
-                                    children: <Widget>[
-                                      Positioned(
-                                        left: 1.0,
-                                        top: 2.0,
-                                        child: Icon(Icons.gif, color: Colors.black54, size: 31),
-                                      ),
-                                      Icon(Icons.gif, color: Colors.white, size: 31),
-                                    ],
-                                  ) : SizedBox.shrink()
-                                ],
-                              )
-                          )
-                        ]
+                    return ClipRRect(
+                        borderRadius: BorderRadius.circular(3),
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                                onLongPress: (){
+                                  downloadImage(context, widget.pm.fullImage);
+                                },
+                                onTap: () {
+                                  openedPosts.add(widget.pm.postID);
+                                  setState(() {
+                                    fullImage = true;
+                                  });
+                                },
+                                child: Image(image: imageProvider)
+                            ),
+                            widget.pm.previewImage.endsWith('gif') ? Stack(
+                              children: <Widget>[
+                                Positioned(
+                                  left: 1.0,
+                                  top: 2.0,
+                                  child: Icon(Icons.gif, color: Colors.black54, size: 31),
+                                ),
+                                Icon(Icons.gif, color: Colors.white, size: 31),
+                              ],
+                            ) : SizedBox.shrink()
+                          ],
+                        )
                     );
                   },
-                  placeholder: (context, url) => Container(height: widget.pm.previewImageHeight.toDouble(), child: Center(child: CircularProgressIndicator(color: Colors.red, strokeWidth: 3))),
+                  placeholder: (context, url) => CircularProgressIndicator(color: theme.themeMainColor, strokeWidth: 3),
                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                 )) : Padding(padding: EdgeInsets.only(top: 10), child: CachedNetworkImage(
                   imageUrl: widget.pm.fullImage,
@@ -795,42 +803,38 @@ class _PostState extends State<Post> {
                   progressIndicatorBuilder: (context, url, downloadProgress) => CachedNetworkImage(
                     imageUrl: widget.pm.previewImage,
                     imageBuilder: (context, imageProvider) {
-                      return Row(
-                          children: [
-                            ClipRRect(
-                                borderRadius: BorderRadius.circular(3),
-                                child: Stack(
-                                  children: [
-                                    GestureDetector(
-                                        onLongPress: (){
-                                          downloadImage(context, widget.pm.fullImage);
-                                        },
-                                        onTap: () {
-                                          openedPosts.add(widget.pm.postID);
-                                          setState(() {
-                                            fullImage = true;
-                                          });
-                                        },
-                                        child: Image(image: imageProvider)
-                                    ),
-                                    Padding(padding: EdgeInsets.only(top: 10, left: 10), child: CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red, strokeWidth: 3)),
-                                    widget.pm.previewImage.endsWith('gif') ? Stack(
-                                      children: <Widget>[
-                                        Positioned(
-                                          left: 1.0,
-                                          top: 2.0,
-                                          child: Icon(Icons.gif, color: Colors.black54, size: 31),
-                                        ),
-                                        Icon(Icons.gif, color: Colors.white, size: 31),
-                                      ],
-                                    ) : SizedBox.shrink()
-                                  ],
-                                )
-                            )
-                          ]
+                      return ClipRRect(
+                          borderRadius: BorderRadius.circular(3),
+                          child: Stack(
+                            children: [
+                              GestureDetector(
+                                  onLongPress: (){
+                                    downloadImage(context, widget.pm.fullImage);
+                                  },
+                                  onTap: () {
+                                    openedPosts.add(widget.pm.postID);
+                                    setState(() {
+                                      fullImage = true;
+                                    });
+                                  },
+                                  child: Image(image: imageProvider)
+                              ),
+                              Padding(padding: EdgeInsets.only(top: 10, left: 10), child: CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor, strokeWidth: 3)),
+                              widget.pm.previewImage.endsWith('gif') ? Stack(
+                                children: <Widget>[
+                                  Positioned(
+                                    left: 1.0,
+                                    top: 2.0,
+                                    child: Icon(Icons.gif, color: Colors.black54, size: 31),
+                                  ),
+                                  Icon(Icons.gif, color: Colors.white, size: 31),
+                                ],
+                              ) : SizedBox.shrink()
+                            ],
+                          )
                       );
                     },
-                    progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red),
+                    progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor),
                     errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                   ),
                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
@@ -853,10 +857,10 @@ class _PostState extends State<Post> {
                   imageBuilder: (context, imageProvider) {
                     return Image(image: imageProvider);
                   },
-                  progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red),
+                  progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor),
                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                 )) : SizedBox.shrink(),
-                Row(children: [Padding(padding: EdgeInsets.only(top: 9), child: Text(widget.pm.timestamp, style: TextStyle(fontWeight: FontWeight.w300, color: Colors.grey, fontSize: 10)))])
+                Row(children: [Padding(padding: EdgeInsets.only(top: 9), child: Text(widget.pm.timestamp, style: TextStyle(fontWeight: FontWeight.w300, color: theme.themeTimeStamp, fontSize: 10)))])
               ],
             ),
           )
@@ -867,40 +871,79 @@ class _PostState extends State<Post> {
 
 void downloadImage(BuildContext context, String url, ) async{
   final scaffold = ScaffoldMessenger.of(context);
-  scaffold.showSnackBar(
-    SnackBar(
-        backgroundColor: Colors.black,
-        content: const Text('Downloading an image...', style: TextStyle(color: Colors.white))
-    ),
-  );
+  scaffold.showSnackBar(SnackBar(
+      backgroundColor: Colors.black,
+      content: const Text('Downloading an image...', style: TextStyle(color: Colors.white))
+  ));
 
   void f() async{
-    var httpClient = new HttpClient();
-    String dir = '/storage/emulated/0/U-18Chan';
-    final myDir = Directory(dir);
-    var isThere = await myDir.exists();
-    if(!isThere) await myDir.create();
-    var request = await httpClient.getUrl(Uri.parse(url));
-    var response = await request.close();
-    var bytes = await consolidateHttpClientResponseBytes(response);
-    File file = new File('$dir/${url.split('/').last}');
-    await file.writeAsBytes(bytes);
-    scaffold.showSnackBar(
-      SnackBar(
-          backgroundColor: Colors.black,
-          content: const Text('Done', style: TextStyle(color: Colors.white))
-      ),
-    );
-  }
+    try{
+      //var httpClient = new HttpClient();
+      var path = await ExtStorage.getExternalStorageDirectory();
+      String dir = '$path/U-18Chan';
+      final myDir = Directory(dir);
+      var isThere = await myDir.exists();
+      if(!isThere) await myDir.create();
+      print(isThere.toString());
+      //var request = await httpClient.getUrl(Uri.parse(url));
+      //var response = await request.close();
+      //var bytes = await consolidateHttpClientResponseBytes(response);
+      //File file = new File('$dir/${url.split('/').last}');
+      await Dio().download(url, '$dir/${url.split('/').last}',
+          options: Options(
+            headers: {"user-agent": "Mozilla/5.0 (compatible; U-18ChanApp/1.0; + https://servokio.ru/apps)"},
+          ),
+          onReceiveProgress: (receivedBytes, totalBytes) {
+            // setState(() {
+            //   downloading = true;
+            //   progress =
+            //       ((receivedBytes / totalBytes) * 100).toStringAsFixed(0) + "%";
+            // });
+      });
+      //await file.writeAsBytes(bytes);
+      scaffold.showSnackBar(
+        SnackBar(
+            backgroundColor: Colors.black,
+            content: const Text('Done', style: TextStyle(color: Colors.white))
+        ),
+      );
+    } catch(e, stack){
+      print(e.toString());
+      Widget okButton = TextButton(
+        child: Text("OK"),
+        onPressed: () => Navigator.pop(context, 'OK')
+      );
 
-  if (await Permission.storage.isGranted){
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        title: Text("An error occurred while downloading the image"),
+        content: Text(e.toString()),
+        actions: [
+          okButton,
+        ],
+      );
+
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+  }
+  DeviceInfoPlugin deviceInfo = new DeviceInfoPlugin();
+  AndroidDeviceInfo build = await deviceInfo.androidInfo;
+
+  if (await Permission.storage.isGranted && (build.version.release == "11" ? await Permission.manageExternalStorage.isGranted : true)){
+    print('Has perms');
     f();
   } else {
-    if (await Permission.storage.isPermanentlyDenied) {
+    if (await Permission.storage.isPermanentlyDenied || (build.version.release == "11" ? await Permission.manageExternalStorage.isPermanentlyDenied : false)) {
       openAppSettings();
     } else {
       print('ref');
-      if (await Permission.storage.request().isGranted) {
+      if (await Permission.storage.request().isGranted && (build.version.release == "11" ? await Permission.manageExternalStorage.request().isGranted : true)) {
         f();
       }
     }

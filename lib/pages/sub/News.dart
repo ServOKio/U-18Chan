@@ -62,7 +62,7 @@ class _NewsState extends State<News> {
                                 width: 21.0,
                                 height: 21.0,
                                 decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.red),
+                                    border: Border.all(color: theme.themeMainColor),
                                     shape: BoxShape.circle
                                 ),
                                 child: Center(child: Text(widget.news[index].author[0])),
@@ -82,7 +82,7 @@ class _NewsState extends State<News> {
                             },
                             data: widget.news[index].html,
                           )),
-                          Row(children: [Text('${widget.news[index].date.day}/${widget.news[index].date.month}/${widget.news[index].date.year}', style: TextStyle(fontWeight: FontWeight.w300, color: Colors.grey, fontSize: 12, letterSpacing: 1))],)
+                          Row(children: [Text('${widget.news[index].date.day}/${widget.news[index].date.month}/${widget.news[index].date.year}', style: TextStyle(fontWeight: FontWeight.w300, color: theme.themeTimeStamp, fontSize: 12, letterSpacing: 1))],)
                         ],
                       ),
                     )

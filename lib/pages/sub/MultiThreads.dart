@@ -11,6 +11,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:ext_storage/ext_storage.dart';
+import 'package:dio/dio.dart';
+import 'package:device_info/device_info.dart';
 
 import '../../main.dart';
 import '../../utils/shit.dart' as utils;
@@ -369,7 +372,7 @@ class _MultiThreadState extends State<MultiThread> {
       imageBuilder: (context, imageProvider) {
         return Container(
             decoration: BoxDecoration(
-              color: Colors.red,
+              color: theme.themeMainColor,
               image: DecorationImage(
                   image: imageProvider,
                   fit: BoxFit.cover
@@ -400,7 +403,7 @@ class _MultiThreadState extends State<MultiThread> {
                                   width: 14.0,
                                   height: 14.0,
                                   decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.red),
+                                      border: Border.all(color: theme.themeMainColor),
                                       shape: BoxShape.circle
                                   ),
                                   child: Center(child: Text(pm.sender[0], style: TextStyle(fontSize: 9))),
@@ -422,7 +425,7 @@ class _MultiThreadState extends State<MultiThread> {
                                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                           RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(18.0),
-                                              side: BorderSide(color: Colors.red)
+                                              side: BorderSide(color: theme.themeMainColor)
                                           )
                                       )
                                   ),
@@ -443,7 +446,7 @@ class _MultiThreadState extends State<MultiThread> {
             )
         );
       },
-      placeholder: (context, url) => Center(child: CircularProgressIndicator(color: Colors.red)),
+      placeholder: (context, url) => Center(child: CircularProgressIndicator(color: theme.themeMainColor)),
       errorWidget: (context, url, error) {
         return Container(
             decoration: BoxDecoration(
@@ -462,7 +465,7 @@ class _MultiThreadState extends State<MultiThread> {
                           width: 14.0,
                           height: 14.0,
                           decoration: BoxDecoration(
-                              border: Border.all(color: Colors.red),
+                              border: Border.all(color: theme.themeMainColor),
                               shape: BoxShape.circle
                           ),
                           child: Center(child: Text(pm.sender[0], style: TextStyle(fontSize: 9))),
@@ -482,7 +485,7 @@ class _MultiThreadState extends State<MultiThread> {
                               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(18.0),
-                                      side: BorderSide(color: Colors.red)
+                                      side: BorderSide(color: theme.themeMainColor)
                                   )
                               )
                           ),
@@ -566,16 +569,16 @@ class _MultiThreadState extends State<MultiThread> {
           backgroundColor: const Color(0xaa000000),
           elevation: 0,
           actions: [
-            Padding(padding: EdgeInsets.only(right: 12), child: GestureDetector(
-              onTap: (){
-                load();
-                //print(Uri.decodeFull("%0A%09%09%3Cdiv%20class%3D%22UserDetails%22%3E%0A%09%09%09%3Cinput%20type%3D%22checkbox%22%20name%3D%22post_1990410%22%2F%3E%20%0A%09%09%09%3Cspan%20class%3D%22Subject%22%3E.%20%3C%2Fspan%3E%0A%09%09%09%3Cspan%20class%3D%22UserName%22%3E%3Ca%20href%3D%27mailto%3A.%27%3EChatin%3C%2Fa%3E%20%3C%2Fspan%3E%20%3Cspan%20class%3D%22CapCodeCustom%22%20style%3D%27color%3Apurple%27%3E%23%20MOD%20%23%3C%2Fspan%3E%20%0A%09%09%09%0A%09%09%09%092021%2F08%2F06%2021%3A46%3A44%20%20%0A%09%09%09%09No.%3Ca%20class%3D%22AltLink%22%20href%3D%22https%3A%2F%2Fu18chan.com%2Fboard%2Fu18chan%2Fgc%2Ftopic%2F1902637%231990410%22%3E1990410%3C%2Fa%3E%20%0A%09%09%09%09%0A%09%09%09%09%20%0A%09%09%09%09%09%09%3Ca%20class%3D%22AltLink%22%20href%3D%22javascript%3AEditPost%281990410%2C%20%27Chatin%27%2C%20%27.%27%2C%20%27.%27%2C%20%27%26gt%3B%26gt%3B1982952%5Cn%5Cn%5Bcolor%3Dred%5D%26quot%3BPlease%20refrain%20from%20using%20anonymising%20proxies.%20If%20we%20discover%20you%20are%20using%20one%2C%20your%20proxy%20will%20probably%20be%20banned.%26quot%3B%5B%2Fcolor%5D%5Cn%5CnFrom%20the%20rules%20page%20for%20the%20site.%20Try%20reading%20them.%20Oh%20look%20two%20new%20VPNs%20to%20ban.%27%2C%200%2C%20%27%27%2C%20%27%27%29%3B%22%20title%3D%22Edit%20Post%22%3E%3Cimg%20src%3D%22https%3A%2F%2Fu18chan.com%2Fthemes%2Fdefault%2Fimages%2Ficons%2Fedit_post.png%22%2F%3E%3C%2Fa%3E%20%0A%09%09%09%09%09%09%0A%09%09%09%09%0A%09%09%3C%2Fdiv%3E%0A%09%3Ca%20href%3D%27https%3A%2F%2Fu18chan.com%2Fboard%2Fu18chan%2Fgc%2Ftopic%2F1902637%231982952%27%20class%3D%27PostLink%27%20onclick%3D%27HighlightPost%281982952%29%3B%27%20%0A%09%09%09%09%09%09%09%3E%0A%09%09%09%09%09%09%09%09%20%26gt%3B%26gt%3B1982952%0A%09%09%09%09%09%09%09%20%20%3C%2Fa%3E%3Cbr%20%2F%3E%3Cbr%20%2F%3E%3Cspan%20style%3D%22color%3A%20red%3B%22%3E%26quot%3BPlease%20refrain%20from%20using%20anonymising%20proxies.%20If%20we%20discover%20you%20are%20using%20one%2C%20your%20proxy%20will%20probably%20be%20banned.%26quot%3B%3C%2Fspan%3E%3Cbr%20%2F%3E%3Cbr%20%2F%3EFrom%20the%20rules%20page%20for%20the%20site.%20Try%20reading%20them.%20Oh%20look%20two%20new%20VPNs%20to%20ban.%3Cbr%2F%3E"));
-                // print("%0A%09%09%3Cdiv%20class%3D%22UserDetails%22%3E%0A%09%09%09%3Cinput%20type%3D%22checkbox%22%20name%3D%22post_1990410%22%2F%3E%20%0A%09%09%09%3Cspan%20class%3D%22Subject%22%3E.%20%3C%2Fspan%3E%0A%09%09%09%3Cspan%20class%3D%22UserName%22%3E%3Ca%20href%3D%27mailto%3A.%27%3EChatin%3C%2Fa%3E%20%3C%2Fspan%3E%20%3Cspan%20class%3D%22CapCodeCustom%22%20style%3D%27color%3Apurple%27%3E%23%20MOD%20%23%3C%2Fspan%3E%20%0A%09%09%09%0A%09%09%09%092021%2F08%2F06%2021%3A46%3A44%20%20%0A%09%09%09%09No.%3Ca%20class%3D%22AltLink%22%20href%3D%22https%3A%2F%2Fu18chan.com%2Fboard%2Fu18chan%2Fgc%2Ftopic%2F1902637%231990410%22%3E1990410%3C%2Fa%3E%20%0A%09%09%09%09%0A%09%09%09%09%20%0A%09%09%09%09%09%09%3Ca%20class%3D%22AltLink%22%20href%3D%22javascript%3AEditPost%281990410%2C%20%27Chatin%27%2C%20%27.%27%2C%20%27.%27%2C%20%27%26gt%3B%26gt%3B1982952%5Cn%5Cn%5Bcolor%3Dred%5D%26quot%3BPlease%20refrain%20from%20using%20anonymising%20proxies.%20If%20we%20discover%20you%20are%20using%20one%2C%20your%20proxy%20will%20probably%20be%20banned.%26quot%3B%5B%2Fcolor%5D%5Cn%5CnFrom%20the%20rules%20page%20for%20the%20site.%20Try%20reading%20them.%20Oh%20look%20two%20new%20VPNs%20to%20ban.%27%2C%200%2C%20%27%27%2C%20%27%27%29%3B%22%20title%3D%22Edit%20Post%22%3E%3Cimg%20src%3D%22https%3A%2F%2Fu18chan.com%2Fthemes%2Fdefault%2Fimages%2Ficons%2Fedit_post.png%22%2F%3E%3C%2Fa%3E%20%0A%09%09%09%09%09%09%0A%09%09%09%09%0A%09%09%3C%2Fdiv%3E%0A%09%3Ca%20href%3D%27https%3A%2F%2Fu18chan.com%2Fboard%2Fu18chan%2Fgc%2Ftopic%2F1902637%231982952%27%20class%3D%27PostLink%27%20onclick%3D%27HighlightPost%281982952%29%3B%27%20%0A%09%09%09%09%09%09%09%3E%0A%09%09%09%09%09%09%09%09%20%26gt%3B%26gt%3B1982952%0A%09%09%09%09%09%09%09%20%20%3C%2Fa%3E%3Cbr%20%2F%3E%3Cbr%20%2F%3E%3Cspan%20style%3D%22color%3A%20red%3B%22%3E%26quot%3BPlease%20refrain%20from%20using%20anonymising%20proxies.%20If%20we%20discover%20you%20are%20using%20one%2C%20your%20proxy%20will%20probably%20be%20banned.%26quot%3B%3C%2Fspan%3E%3Cbr%20%2F%3E%3Cbr%20%2F%3EFrom%20the%20rules%20page%20for%20the%20site.%20Try%20reading%20them.%20Oh%20look%20two%20new%20VPNs%20to%20ban.%3Cbr%2F%3E"
-                //   .replaceAll('%3C', '<').replaceAll('%20', ' ').replaceAll('%3D', '=').replaceAll('%22', '"')
-                // );
-              },
-              child: Icon(Icons.star_border),
-            ))
+            // Padding(padding: EdgeInsets.only(right: 12), child: GestureDetector(
+            //   onTap: (){
+            //     load();
+            //     //print(Uri.decodeFull("%0A%09%09%3Cdiv%20class%3D%22UserDetails%22%3E%0A%09%09%09%3Cinput%20type%3D%22checkbox%22%20name%3D%22post_1990410%22%2F%3E%20%0A%09%09%09%3Cspan%20class%3D%22Subject%22%3E.%20%3C%2Fspan%3E%0A%09%09%09%3Cspan%20class%3D%22UserName%22%3E%3Ca%20href%3D%27mailto%3A.%27%3EChatin%3C%2Fa%3E%20%3C%2Fspan%3E%20%3Cspan%20class%3D%22CapCodeCustom%22%20style%3D%27color%3Apurple%27%3E%23%20MOD%20%23%3C%2Fspan%3E%20%0A%09%09%09%0A%09%09%09%092021%2F08%2F06%2021%3A46%3A44%20%20%0A%09%09%09%09No.%3Ca%20class%3D%22AltLink%22%20href%3D%22https%3A%2F%2Fu18chan.com%2Fboard%2Fu18chan%2Fgc%2Ftopic%2F1902637%231990410%22%3E1990410%3C%2Fa%3E%20%0A%09%09%09%09%0A%09%09%09%09%20%0A%09%09%09%09%09%09%3Ca%20class%3D%22AltLink%22%20href%3D%22javascript%3AEditPost%281990410%2C%20%27Chatin%27%2C%20%27.%27%2C%20%27.%27%2C%20%27%26gt%3B%26gt%3B1982952%5Cn%5Cn%5Bcolor%3Dred%5D%26quot%3BPlease%20refrain%20from%20using%20anonymising%20proxies.%20If%20we%20discover%20you%20are%20using%20one%2C%20your%20proxy%20will%20probably%20be%20banned.%26quot%3B%5B%2Fcolor%5D%5Cn%5CnFrom%20the%20rules%20page%20for%20the%20site.%20Try%20reading%20them.%20Oh%20look%20two%20new%20VPNs%20to%20ban.%27%2C%200%2C%20%27%27%2C%20%27%27%29%3B%22%20title%3D%22Edit%20Post%22%3E%3Cimg%20src%3D%22https%3A%2F%2Fu18chan.com%2Fthemes%2Fdefault%2Fimages%2Ficons%2Fedit_post.png%22%2F%3E%3C%2Fa%3E%20%0A%09%09%09%09%09%09%0A%09%09%09%09%0A%09%09%3C%2Fdiv%3E%0A%09%3Ca%20href%3D%27https%3A%2F%2Fu18chan.com%2Fboard%2Fu18chan%2Fgc%2Ftopic%2F1902637%231982952%27%20class%3D%27PostLink%27%20onclick%3D%27HighlightPost%281982952%29%3B%27%20%0A%09%09%09%09%09%09%09%3E%0A%09%09%09%09%09%09%09%09%20%26gt%3B%26gt%3B1982952%0A%09%09%09%09%09%09%09%20%20%3C%2Fa%3E%3Cbr%20%2F%3E%3Cbr%20%2F%3E%3Cspan%20style%3D%22color%3A%20red%3B%22%3E%26quot%3BPlease%20refrain%20from%20using%20anonymising%20proxies.%20If%20we%20discover%20you%20are%20using%20one%2C%20your%20proxy%20will%20probably%20be%20banned.%26quot%3B%3C%2Fspan%3E%3Cbr%20%2F%3E%3Cbr%20%2F%3EFrom%20the%20rules%20page%20for%20the%20site.%20Try%20reading%20them.%20Oh%20look%20two%20new%20VPNs%20to%20ban.%3Cbr%2F%3E"));
+            //     // print("%0A%09%09%3Cdiv%20class%3D%22UserDetails%22%3E%0A%09%09%09%3Cinput%20type%3D%22checkbox%22%20name%3D%22post_1990410%22%2F%3E%20%0A%09%09%09%3Cspan%20class%3D%22Subject%22%3E.%20%3C%2Fspan%3E%0A%09%09%09%3Cspan%20class%3D%22UserName%22%3E%3Ca%20href%3D%27mailto%3A.%27%3EChatin%3C%2Fa%3E%20%3C%2Fspan%3E%20%3Cspan%20class%3D%22CapCodeCustom%22%20style%3D%27color%3Apurple%27%3E%23%20MOD%20%23%3C%2Fspan%3E%20%0A%09%09%09%0A%09%09%09%092021%2F08%2F06%2021%3A46%3A44%20%20%0A%09%09%09%09No.%3Ca%20class%3D%22AltLink%22%20href%3D%22https%3A%2F%2Fu18chan.com%2Fboard%2Fu18chan%2Fgc%2Ftopic%2F1902637%231990410%22%3E1990410%3C%2Fa%3E%20%0A%09%09%09%09%0A%09%09%09%09%20%0A%09%09%09%09%09%09%3Ca%20class%3D%22AltLink%22%20href%3D%22javascript%3AEditPost%281990410%2C%20%27Chatin%27%2C%20%27.%27%2C%20%27.%27%2C%20%27%26gt%3B%26gt%3B1982952%5Cn%5Cn%5Bcolor%3Dred%5D%26quot%3BPlease%20refrain%20from%20using%20anonymising%20proxies.%20If%20we%20discover%20you%20are%20using%20one%2C%20your%20proxy%20will%20probably%20be%20banned.%26quot%3B%5B%2Fcolor%5D%5Cn%5CnFrom%20the%20rules%20page%20for%20the%20site.%20Try%20reading%20them.%20Oh%20look%20two%20new%20VPNs%20to%20ban.%27%2C%200%2C%20%27%27%2C%20%27%27%29%3B%22%20title%3D%22Edit%20Post%22%3E%3Cimg%20src%3D%22https%3A%2F%2Fu18chan.com%2Fthemes%2Fdefault%2Fimages%2Ficons%2Fedit_post.png%22%2F%3E%3C%2Fa%3E%20%0A%09%09%09%09%09%09%0A%09%09%09%09%0A%09%09%3C%2Fdiv%3E%0A%09%3Ca%20href%3D%27https%3A%2F%2Fu18chan.com%2Fboard%2Fu18chan%2Fgc%2Ftopic%2F1902637%231982952%27%20class%3D%27PostLink%27%20onclick%3D%27HighlightPost%281982952%29%3B%27%20%0A%09%09%09%09%09%09%09%3E%0A%09%09%09%09%09%09%09%09%20%26gt%3B%26gt%3B1982952%0A%09%09%09%09%09%09%09%20%20%3C%2Fa%3E%3Cbr%20%2F%3E%3Cbr%20%2F%3E%3Cspan%20style%3D%22color%3A%20red%3B%22%3E%26quot%3BPlease%20refrain%20from%20using%20anonymising%20proxies.%20If%20we%20discover%20you%20are%20using%20one%2C%20your%20proxy%20will%20probably%20be%20banned.%26quot%3B%3C%2Fspan%3E%3Cbr%20%2F%3E%3Cbr%20%2F%3EFrom%20the%20rules%20page%20for%20the%20site.%20Try%20reading%20them.%20Oh%20look%20two%20new%20VPNs%20to%20ban.%3Cbr%2F%3E"
+            //     //   .replaceAll('%3C', '<').replaceAll('%20', ' ').replaceAll('%3D', '=').replaceAll('%22', '"')
+            //     // );
+            //   },
+            //   child: Icon(Icons.star_border),
+            // ))
           ]
         ),
         body: loaded ? Padding(padding: EdgeInsets.symmetric(horizontal: 3.5),child: Scrollbar(
@@ -604,7 +607,7 @@ class _MultiThreadState extends State<MultiThread> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(7),
                             child: Container(
-                                color: pages[index].active ? theme.pagesButtons : const Color(0x77f44336),
+                                color: pages[index].active ? theme.pagesButtons : theme.pagesButtonsPressed,
                                 child: AspectRatio(
                                     aspectRatio: 1,
                                     child: Center(
@@ -622,7 +625,7 @@ class _MultiThreadState extends State<MultiThread> {
             itemCount: posts.length+1,
           ),
         )): Center(
-          child: CircularProgressIndicator(color: Colors.red, semanticsLabel: 'Loading'),
+          child: CircularProgressIndicator(color: theme.themeMainColor, semanticsLabel: 'Loading'),
         )
     );
   }
@@ -682,6 +685,7 @@ class _PostState extends State<Post> {
             padding: EdgeInsets.all(12),
             color: theme.newsBlock,
             child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -691,7 +695,7 @@ class _PostState extends State<Post> {
                       width: 14.0,
                       height: 14.0,
                       decoration: BoxDecoration(
-                          border: Border.all(color: Colors.red),
+                          border: Border.all(color: theme.themeMainColor),
                           shape: BoxShape.circle
                       ),
                       child: Center(child: Text(widget.pm.sender[0], style: TextStyle(fontSize: 10))),
@@ -775,7 +779,7 @@ class _PostState extends State<Post> {
                                             ]
                                         );
                                       },
-                                      placeholder: (context, url) => Container(height: widget.pm.previewImageHeight.toDouble(), child: Center(child: CircularProgressIndicator(color: Colors.red, strokeWidth: 3))),
+                                      placeholder: (context, url) => Container(height: widget.pm.previewImageHeight.toDouble(), child: Center(child: CircularProgressIndicator(color: theme.themeMainColor, strokeWidth: 3))),
                                       errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                                     )) : SizedBox.shrink(),
                                     widget.pm.replies[int.parse(context.tree.element!.text)]!.file.length > 0 ? ClipPath(
@@ -804,7 +808,7 @@ class _PostState extends State<Post> {
                                                     imageBuilder: (context, imageProvider) {
                                                       return Image(image: imageProvider);
                                                     },
-                                                    progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red),
+                                                    progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor),
                                                     errorWidget: (context, url, error) => SizedBox.shrink(),
                                                   )
                                               )) : SizedBox.shrink()
@@ -850,7 +854,7 @@ class _PostState extends State<Post> {
                                 imageBuilder: (context, imageProvider) {
                                   return Image(image: imageProvider);
                                 },
-                                progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red),
+                                progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor),
                                 errorWidget: (context, url, error) => SizedBox.shrink(),
                               )
                           )) : SizedBox.shrink()
@@ -861,40 +865,36 @@ class _PostState extends State<Post> {
                 widget.pm.previewImage != '' ? !fullImage ? Padding(padding: EdgeInsets.only(top: 10), child: CachedNetworkImage(
                   imageUrl: widget.pm.previewImage,
                   imageBuilder: (context, imageProvider) {
-                    return Row(
-                        children: [
-                          ClipRRect(
-                              borderRadius: BorderRadius.circular(3),
-                              child: Stack(
-                                children: [
-                                  GestureDetector(
-                                      onLongPress: (){
-                                        downloadImage(context, widget.pm.fullImage);
-                                      },
-                                      onTap: () {
-                                        setState(() {
-                                          fullImage = !fullImage;
-                                        });
-                                      },
-                                      child: Image(image: imageProvider)
-                                  ),
-                                  widget.pm.previewImage.endsWith('gif') ? Stack(
-                                    children: <Widget>[
-                                      Positioned(
-                                        left: 1.0,
-                                        top: 2.0,
-                                        child: Icon(Icons.gif, color: Colors.black54, size: 31),
-                                      ),
-                                      Icon(Icons.gif, color: Colors.white, size: 31),
-                                    ],
-                                  ) : SizedBox.shrink()
-                                ],
-                              )
-                          )
-                        ]
+                    return ClipRRect(
+                        borderRadius: BorderRadius.circular(3),
+                        child: Stack(
+                          children: [
+                            GestureDetector(
+                                onLongPress: (){
+                                  downloadImage(context, widget.pm.fullImage);
+                                },
+                                onTap: () {
+                                  setState(() {
+                                    fullImage = !fullImage;
+                                  });
+                                },
+                                child: Image(image: imageProvider)
+                            ),
+                            widget.pm.previewImage.endsWith('gif') ? Stack(
+                              children: <Widget>[
+                                Positioned(
+                                  left: 1.0,
+                                  top: 2.0,
+                                  child: Icon(Icons.gif, color: Colors.black54, size: 31),
+                                ),
+                                Icon(Icons.gif, color: Colors.white, size: 31),
+                              ],
+                            ) : SizedBox.shrink()
+                          ],
+                        )
                     );
                   },
-                  placeholder: (context, url) => Container(height: widget.pm.previewImageHeight.toDouble(), child: Center(child: CircularProgressIndicator(color: Colors.red, strokeWidth: 3))),
+                  placeholder: (context, url) => CircularProgressIndicator(color: theme.themeMainColor, strokeWidth: 3),
                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                 )) : Padding(padding: EdgeInsets.only(top: 10), child: CachedNetworkImage(
                   imageUrl: widget.pm.fullImage,
@@ -914,41 +914,37 @@ class _PostState extends State<Post> {
                   progressIndicatorBuilder: (context, url, downloadProgress) => CachedNetworkImage(
                     imageUrl: widget.pm.previewImage,
                     imageBuilder: (context, imageProvider) {
-                      return Row(
-                          children: [
-                            ClipRRect(
-                                borderRadius: BorderRadius.circular(3),
-                                child: Stack(
-                                  children: [
-                                    GestureDetector(
-                                        onLongPress: (){
-                                          downloadImage(context, widget.pm.fullImage);
-                                        },
-                                        onTap: () {
-                                          setState(() {
-                                            fullImage = !fullImage;
-                                          });
-                                        },
-                                        child: Image(image: imageProvider)
-                                    ),
-                                    Padding(padding: EdgeInsets.only(top: 10, left: 10), child: CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red, strokeWidth: 3)),
-                                    widget.pm.previewImage.endsWith('gif') ? Stack(
-                                      children: <Widget>[
-                                        Positioned(
-                                          left: 1.0,
-                                          top: 2.0,
-                                          child: Icon(Icons.gif, color: Colors.black54, size: 31),
-                                        ),
-                                        Icon(Icons.gif, color: Colors.white, size: 31),
-                                      ],
-                                    ) : SizedBox.shrink()
-                                  ],
-                                )
-                            )
-                          ]
+                      return ClipRRect(
+                          borderRadius: BorderRadius.circular(3),
+                          child: Stack(
+                            children: [
+                              GestureDetector(
+                                  onLongPress: (){
+                                    downloadImage(context, widget.pm.fullImage);
+                                  },
+                                  onTap: () {
+                                    setState(() {
+                                      fullImage = !fullImage;
+                                    });
+                                  },
+                                  child: Image(image: imageProvider)
+                              ),
+                              Padding(padding: EdgeInsets.only(top: 10, left: 10), child: CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor, strokeWidth: 3)),
+                              widget.pm.previewImage.endsWith('gif') ? Stack(
+                                children: <Widget>[
+                                  Positioned(
+                                    left: 1.0,
+                                    top: 2.0,
+                                    child: Icon(Icons.gif, color: Colors.black54, size: 31),
+                                  ),
+                                  Icon(Icons.gif, color: Colors.white, size: 31),
+                                ],
+                              ) : SizedBox.shrink()
+                            ],
+                          )
                       );
                     },
-                    progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red),
+                    progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor),
                     errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                   ),
                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
@@ -981,10 +977,10 @@ class _PostState extends State<Post> {
                         child: Image(image: imageProvider)
                     );
                   },
-                  progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: Colors.red),
+                  progressIndicatorBuilder: (context, url, downloadProgress) => CircularProgressIndicator(value: downloadProgress.progress, color: theme.themeMainColor),
                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                 )) : SizedBox.shrink(),
-                Padding(padding: EdgeInsets.only(top: 9), child: Align(alignment: Alignment.centerLeft, child:  Text(widget.pm.timestamp, style: TextStyle(fontWeight: FontWeight.w300, color: Colors.grey, fontSize: 10))))
+                Padding(padding: EdgeInsets.only(top: 9), child: Align(alignment: Alignment.centerLeft, child:  Text(widget.pm.timestamp, style: TextStyle(fontWeight: FontWeight.w300, color: theme.themeTimeStamp, fontSize: 10))))
               ]
             )
           )
@@ -999,48 +995,85 @@ String findShit(String content){
   });
 }
 
-void downloadImage(BuildContext context, String url, ){
-  SchedulerBinding.instance?.addPostFrameCallback((_) async{
-    final scaffold = ScaffoldMessenger.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-          backgroundColor: Colors.black,
-          content: const Text('Downloading an image...', style: TextStyle(color: Colors.white))
-      ),
-    );
+void downloadImage(BuildContext context, String url, ) async{
+  final scaffold = ScaffoldMessenger.of(context);
+  scaffold.showSnackBar(SnackBar(
+      backgroundColor: Colors.black,
+      content: const Text('Downloading an image...', style: TextStyle(color: Colors.white))
+  ));
 
-    void f() async{
-      var httpClient = new HttpClient();
-      String dir = '/storage/emulated/0/U-18Chan';
+  void f() async{
+    try{
+      //var httpClient = new HttpClient();
+      var path = await ExtStorage.getExternalStorageDirectory();
+      String dir = '$path/U-18Chan';
       final myDir = Directory(dir);
       var isThere = await myDir.exists();
       if(!isThere) await myDir.create();
-      var request = await httpClient.getUrl(Uri.parse(url));
-      var response = await request.close();
-      var bytes = await consolidateHttpClientResponseBytes(response);
-      File file = new File('$dir/${url.split('/').last}');
-      await file.writeAsBytes(bytes);
+      print(isThere.toString());
+      //var request = await httpClient.getUrl(Uri.parse(url));
+      //var response = await request.close();
+      //var bytes = await consolidateHttpClientResponseBytes(response);
+      //File file = new File('$dir/${url.split('/').last}');
+      await Dio().download(url, '$dir/${url.split('/').last}',
+          options: Options(
+            headers: {"user-agent": "Mozilla/5.0 (compatible; U-18ChanApp/1.0; + https://servokio.ru/apps)"},
+          ),
+          onReceiveProgress: (receivedBytes, totalBytes) {
+            // setState(() {
+            //   downloading = true;
+            //   progress =
+            //       ((receivedBytes / totalBytes) * 100).toStringAsFixed(0) + "%";
+            // });
+          });
+      //await file.writeAsBytes(bytes);
       scaffold.showSnackBar(
         SnackBar(
             backgroundColor: Colors.black,
             content: const Text('Done', style: TextStyle(color: Colors.white))
         ),
       );
-    }
+    } catch(e, stack){
+      print(e.toString());
+      Widget okButton = TextButton(
+          child: Text("OK"),
+          onPressed: () => Navigator.pop(context, 'OK')
+      );
 
-    if (await Permission.storage.isGranted){
-      f();
+      // set up the AlertDialog
+      AlertDialog alert = AlertDialog(
+        title: Text("An error occurred while downloading the image"),
+        content: Text(e.toString()),
+        actions: [
+          okButton,
+        ],
+      );
+
+      // show the dialog
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return alert;
+        },
+      );
+    }
+  }
+  DeviceInfoPlugin deviceInfo = new DeviceInfoPlugin();
+  AndroidDeviceInfo build = await deviceInfo.androidInfo;
+
+  if (await Permission.storage.isGranted && (build.version.release == "11" ? await Permission.manageExternalStorage.isGranted : true)){
+    print('Has perms');
+    f();
+  } else {
+    if (await Permission.storage.isPermanentlyDenied || (build.version.release == "11" ? await Permission.manageExternalStorage.isPermanentlyDenied : false)) {
+      openAppSettings();
     } else {
-      if (await Permission.storage.isPermanentlyDenied) {
-        openAppSettings();
-      } else {
-        print('ref');
-        if (await Permission.storage.request().isGranted) {
-          f();
-        }
+      print('ref');
+      if (await Permission.storage.request().isGranted && (build.version.release == "11" ? await Permission.manageExternalStorage.request().isGranted : true)) {
+        f();
       }
     }
-  });
+  }
 }
 
 bool isNull(String text){

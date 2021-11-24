@@ -5,15 +5,12 @@ import 'package:u_18chan/pages/chat.dart';
 import 'package:u_18chan/pages/main.dart';
 import 'package:u_18chan/pages/section.dart';
 
-import 'package:flutter/material.dart';
 import 'dart:developer';
 import 'package:html/parser.dart';
 import 'package:http/http.dart' as http;
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:provider/provider.dart';
 import 'package:u_18chan/pages/sub/MultiThreads.dart';
 import 'package:u_18chan/pages/sub/News.dart';
-import 'package:u_18chan/pages/sub/Thread.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 void main() {
@@ -21,17 +18,34 @@ void main() {
 }
 
 class MyAppTheme {
+
+  bool isDark = true;
+
+  MyAppTheme({required this.isDark});
+
   Color newsBlock = Color(0xff333333);
+  Color themeMainColor = Colors.red;
+  Color themeTimeStamp = Colors.grey;
   Color newsBlockTitleSub = Color(0xffD5D5D5);
   Color link = Color(0xffBBDDEE);
   Color pagesButtons = Colors.red;
-  bool isDark = true;
+  Color pagesButtonsPressed = const Color(0x77f44336);
+
+  void init(){
+    newsBlock = isDark ? Color(0xff333333) : Color(0xff5C72CB);
+    themeMainColor = isDark ? Colors.red : Color(0xff93d0ea);
+    themeTimeStamp = isDark ? Colors.grey : Colors.white70;
+    newsBlockTitleSub = Color(0xffD5D5D5);
+    link = Color(0xffBBDDEE);
+    pagesButtons = isDark ? Colors.red : Color(0xff445fca);
+    pagesButtonsPressed = isDark ? const Color(0x77f44336) : Color(0xff667ddb);
+  }
 
   /// Default constructor
 
   ThemeData get themeData {
     /// Create a TextTheme and ColorScheme, that we can use to generate ThemeData
-    TextTheme txtTheme = (isDark ? ThemeData.dark() : ThemeData.light()).textTheme;
+    TextTheme txtTheme = (ThemeData.dark()).textTheme;
     Color txtColor = Colors.red;
     ColorScheme colorScheme = ColorScheme(
       // Decide how you want to apply your own custom them, to the MaterialApp
@@ -41,9 +55,9 @@ class MyAppTheme {
         secondary: const Color(0xffBBDDEE),
         secondaryVariant: Colors.purple,
         background: const Color(0xff1A1A1A),
-        surface: Colors.red,
+        surface: isDark ? const Color(0xFF222222) : const Color(0xFF31469b),
         onBackground: txtColor,
-        onSurface: txtColor,
+        onSurface: Colors.white,
         onError: Colors.white,
         onPrimary: Colors.white,
         onSecondary: Colors.white,
@@ -55,8 +69,8 @@ class MyAppTheme {
         textTheme: txtTheme,
         colorScheme: colorScheme
     ).copyWith(
-        primaryColor: const Color(0xFF222222),
-        scaffoldBackgroundColor: const Color(0xFF1C1C1C),
+        primaryColor: isDark ? const Color(0xFF222222) : const Color(0xFF31469b),
+        scaffoldBackgroundColor: isDark ? const Color(0xFF1C1C1C) : const Color(0xFF788BD6),
         buttonColor: Colors.purple,
         highlightColor: const Color(0xFF3D3D3D),
         toggleableActiveColor: Colors.purple
@@ -67,19 +81,36 @@ class MyAppTheme {
   }
 }
 
+ValueNotifier<bool> _notifier = ValueNotifier(false);
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
+  void i() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final bool th = (prefs.getBool('isLight') ?? false);
+    print(th);
+    _notifier.value = th;
+  }
+
   @override
   Widget build(BuildContext context) {
-    MyAppTheme appTheme = MyAppTheme();
-    return Provider.value(
-        value: appTheme,
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          title: 'U-18Chan',
-          theme: appTheme.themeData,
-          home: Main(),
-        )
+    i();
+    return ValueListenableBuilder<bool>(
+        valueListenable: _notifier,
+        builder: (_, mode, __) {
+          MyAppTheme appTheme = MyAppTheme(isDark: !mode);
+          appTheme.init();
+          return Provider.value(
+              value: appTheme,
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                title: 'U-18Chan',
+                theme: appTheme.themeData,
+                home: Main(),
+              )
+          );
+        }
     );
   }
 }
@@ -185,6 +216,13 @@ class _MainState extends State<Main> {
     loadMenu();
   }
 
+  Future<void> setBo(bool val) async {
+    final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+    final SharedPreferences prefs = await _prefs;
+    prefs.setBool('isLight', val);
+    print(prefs.getBool('isLight'));
+  }
+
   @override
   Widget build(BuildContext context) {
     //Test init
@@ -229,7 +267,7 @@ class _MainState extends State<Main> {
           image: DecorationImage(
               alignment: Alignment.centerLeft,
               scale: 2.5,
-              image: AssetImage("assets/Valkyria02.png"),
+              image: AssetImage(!_notifier.value ? "assets/Valkyria02.png" : "assets/Rainbowdash.png"),
               fit: BoxFit.scaleDown
           )
       ),
@@ -241,21 +279,21 @@ class _MainState extends State<Main> {
             "U-18Chan",
             style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 28
+                fontSize: !_notifier.value ? 28 : 38
             ),
           ),
           Text(
             "Being rammed by larger ships since 1914.",
             style: TextStyle(
                 fontWeight: FontWeight.w400,
-                fontSize: 6.7
+                fontSize: !_notifier.value ? 6.7 : 9.2
             ),
           )
         ],
       ),
     ));
     menu.insert(menu.length, Container(
-      margin: EdgeInsets.all(14),
+      margin: EdgeInsets.only(top: 14, left: 14),
         child: Row(
           children: [Text('Fap Mode'), Switch(
             value: fapmode,
@@ -266,6 +304,22 @@ class _MainState extends State<Main> {
             },
             activeTrackColor: Colors.lightGreenAccent,
             activeColor: Colors.green,
+          )],
+        )
+    ));
+    menu.insert(menu.length, Container(
+        margin: EdgeInsets.only(left: 14, bottom: 14),
+        child: Row(
+          children: [Text('Theme '+(_notifier.value ? 'Sky' : 'Dark')), Switch(
+            value: _notifier.value,
+            onChanged: (value) {
+              setBo(value);
+              setState(() {
+                _notifier.value = value;
+              });
+            },
+            activeTrackColor: Colors.lightBlueAccent,
+            activeColor: Colors.blue,
           )],
         )
     ));
@@ -280,15 +334,15 @@ class _MainState extends State<Main> {
       //   child: Icon(Icons.add),
       // ), // This trailing comma makes auto-formatting nicer for build methods.
         drawer: Theme(
-        data: Theme.of(context).copyWith(canvasColor: const Color(0xbb000000)),
-    child: Drawer(
+        data: Theme.of(context).copyWith(canvasColor: !_notifier.value ? const Color(0xbb000000) : const Color(0xbb788BD6)),
+        child: Drawer(
           child: Container(
             child: ListView(
               // Important: Remove any padding from the ListView.
               children: menu
             ),
           ),
-    )
+          )
         )
     );
   }

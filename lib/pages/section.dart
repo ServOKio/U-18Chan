@@ -220,6 +220,16 @@ class _SectionState extends State<Section> {
                                       Center(child: CircularProgressIndicator(color: getColor(index))),
                                   errorWidget: (context, url, error) => Center(child: Icon(Icons.error)),
                                 ),
+                                blocks[index].thumbnail.endsWith('gif') ? Stack(
+                                  children: <Widget>[
+                                    Positioned(
+                                      left: 1.0,
+                                      top: 2.0,
+                                      child: Icon(Icons.gif, color: Colors.black54, size: 31),
+                                    ),
+                                    Icon(Icons.gif, color: Colors.white, size: 31),
+                                  ],
+                                ) : SizedBox.shrink(),
                                 _buildGradient(),
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.end,
